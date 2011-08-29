@@ -1,8 +1,15 @@
 <?php
 
 /**
- * Generic Class that can be extended for creating admin screens for plugins.	
+ * Admin Screens
+ *
+ * @author Kunal Bhalla
+ * @version 0.1
  * @package KB_Includes
+ */
+
+/**
+ * Generic Class that can be extended for creating admin screens for plugins.	
  */
 
  class KB_Admin {
