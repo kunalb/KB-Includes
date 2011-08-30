@@ -11,7 +11,7 @@
 /** 
  * Generic class to handle common CPT functionality.
  */
-class KB_Cpt {
+class KB_Cpt extends KB_At {
 
 	/** Arguments passed on for registering the post type. */
 	private $args;
@@ -19,7 +19,10 @@ class KB_Cpt {
 	/** The post type identifier */
 	private $id;
 	
+	/** Constructor -- check if the 'init' action has run and accordingly register the post type. */
 	public function __construct( $name, $args = Array() ) {
+		parent::__construct();
+
 		if( empty( $name ) )
 			throw new Exception( "CPT instance requires a name." );
 
@@ -27,7 +30,7 @@ class KB_Cpt {
 
 		$this->args = $this->parse_args( $args );
 
-		( did_action( 'init' ) === TRUE )? $this->register() : add_action
+		( did_action( 'init' ) === TRUE )? $this->register() : add_action( 'init', Array( $this, 'register' ) );
 	}
 
 	private function parse_args( $args ) {
