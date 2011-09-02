@@ -19,10 +19,20 @@
 	 * The suffix generated for this plugin.
 	 * @var string
 	 */
-	protected $hook_suffix;
+	private $hook;
 
 	/**
-	 * Store slug used for the page.
+	 * Is this page the current page?
+	 * @var Bool
+	 */
+	private $is;
+
+	/**#@+
+	 * Over-ride these variables to create a new page class.
+	 */
+
+	/**
+	 * Store slug used for the page. 
 	 * @var Array[string]String
 	 */
 	protected $slug;
@@ -78,11 +88,7 @@
 	 */
 	protected $parent = 'admin.php'; 
 
-	/**
-	 * Is this page the current page?
-	 * @var Bool
-	 */
-	private $is;
+	/**#@-*/
 
 	/**
 	 * The constructor, conditionally initializes the requirements for the plugin.
@@ -98,15 +104,15 @@
 		else 
 			add_action( ( is_network_admin() )? 'network_admin_menu' : 'admin_menu', Array( $this, 'hook_page' ), 9 );
 
-		/** Attach function for loading resources and customizations, if required. Runs on this hook as soon as $hook_suffix is populated. */
+		/** Attach function for loading resources and customizations, if required. Runs on this hook as soon as $hook is populated. */
 		add_action( 'admin_enqueue_scripts', Array( $this, 'init' ), 11, 1 );
 
 	}
 
-	/** Add menus and determine the hook_suffix. */
+	/** Add menus and determine the hook. */
 	public function add_to_menu() {
 		if( $this->args['parent'] == 'admin.php' )
-			$this->hook_suffix = add_menu_page( 
+			$this->hook = add_menu_page( 
 				$this->page_title, 
 				$this->menu_title, 
 				$this->capability, 
@@ -116,7 +122,7 @@
 				$this->position
 			);
 		else
-			$this->hook_suffix = add_submenu_page( 
+			$this->hook = add_submenu_page( 
 				$this->parent,
 				$this->page_title, 
 				$this->menu_title, 
@@ -125,27 +131,27 @@
 				Array( $this, 'body_wrapper' )
 			);
 			
-		add_action( 'load-' . $this->hook_suffix, Array( $this, 'set_current_page' ) );
+		add_action( 'load-' . $this->hook, Array( $this, 'set_current_page' ) );
 	}
 
 	/** 
 	 * Wrapper for conditionally loading resources 
-	 * @param string hook_suffix The current hook suffix for checking before loading.
+	 * @param string hook The current hook suffix for checking before loading.
 	 */
-	public function init( $hook_suffix ) {
-		if( $this->hook_suffix == $hook_suffix ) {
+	public function init( $hook ) {
+		if( $this->hook == $hook ) {
 			$this->load_resources();
 
 			/** Override screen meta data here. */
 			$this->customize_screen();
 		
 			/** Add contextual help. The actual text should be overridden */
-			add_contextual_help( $this->hook_suffix, $this->help() );
+			add_contextual_help( $this->hook, $this->help() );
 		}
 	}
 
 	/** 
-	 * Add a page to be loaded for the specified slug. 
+	 * Add a page to be loaded for the specified slug. Do not over-ride.
 	 *
 	 * Only used for instances without a menu page. This code is based off the internals
 	 * of add_menu_page.
@@ -155,12 +161,12 @@
 
 	
 		$admin_page_hooks[$this->slug] = sanitize_title( $this->page_title ); 
-		$this->hook_suffix = get_plugin_page_hookname( $this->slug, "" );
-		$_registered_pages[$this->hook_suffix] = true;
+		$this->hook = get_plugin_page_hookname( $this->slug, "" );
+		$_registered_pages[$this->hook] = true;
 		$_parent_pages[$this->slug] = false;
 
-		add_action( $this->hook_suffix, Array( $this, 'body_wrapper' ) );
-		add_action( 'load-' . $this->hook_suffix, Array( $this, 'set_current_page' ) );
+		add_action( $this->hook, Array( $this, 'body_wrapper' ) );
+		add_action( 'load-' . $this->hook, Array( $this, 'set_current_page' ) );
 
 		add_filter( 'admin_title', Array( $this, hook_page_title ) , 10, 2 );
 	}
@@ -207,13 +213,16 @@
 		echo <<<ADMIN_PAGE
 		<div class = 'wrap'>
 ADMIN_PAGE;
-			echo $this->body();
-echo <<<ADMIN_PAGE
+			$this->body();
+		echo <<<ADMIN_PAGE
 		</div>
 ADMIN_PAGE;
 	}
 
-	/** Extend this function to actually display the contents of the page. */
+	/**
+	 * Extend this function to actually display the contents of the page. Should 
+	 * echo the data to be displayed. 
+	 */
 	public function body() {
 	}
 
