@@ -213,7 +213,7 @@
 		echo <<<ADMIN_PAGE
 		<div class = 'wrap'>
 ADMIN_PAGE;
-			$this->body();
+			echo $this->body();
 		echo <<<ADMIN_PAGE
 		</div>
 ADMIN_PAGE;
