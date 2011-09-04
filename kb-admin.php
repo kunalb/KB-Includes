@@ -106,7 +106,6 @@
 
 		/** Attach function for loading resources and customizations, if required. Runs on this hook as soon as $hook is populated. */
 		add_action( 'admin_enqueue_scripts', Array( $this, 'init' ), 11, 1 );
-
 	}
 
 	/** Add menus and determine the hook. */
@@ -139,7 +138,7 @@
 	 * @param string hook The current hook suffix for checking before loading.
 	 */
 	public function init( $hook ) {
-		if( $this->hook == $hook ) {
+		if( $this->current_page() ) {
 			$this->load_resources();
 
 			/** Override screen meta data here. */
@@ -181,8 +180,14 @@
 			return $admin_title;	
 	}
 
-	/** Runs only if the page corresponding to this class is called. */
+	/**
+	 * Runs only if the page corresponding to this class is called. 
+	 * Also runs a security check on the caps of the user.
+	 */
 	public function set_current_page() {
+		if( !current_user_can( $this->capability ) )
+			wp_die( __( 'You do not have sufficient permissions to access this page.', 'kb-includes' ) );
+
 		$this->is = true;
 	}
 	 
