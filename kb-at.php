@@ -21,8 +21,19 @@
  * in the function.
  */
 class KB_At {
+	/**
+	 * Reflection of this class.
+	 * @var ReflectionClass
+	 */
 	private $reflect;
 
+	/**
+	 * Hooks based on docs
+	 *
+	 * Obtains the docblocks for each method of the class,
+	 * and checks both for the existence of at @hook and
+	 * that the function is publically accessible.
+	 */
 	public function __construct() {
 		$this->reflect = new ReflectionClass( $this );
 		$methods = $this->reflect->getMethods();
@@ -31,7 +42,7 @@ class KB_At {
 			$docBlock = $method->getDocComment(); 
 			$docs = $this->docBlockExtractor( $docBlock );
 
-			if( array_key_exists( 'hook', $docs ) ) {
+			if( array_key_exists( 'hook', $docs ) && $method->isPublic() ) {
 				$params = $method->getNumberOfParameters();
 				$func = Array( $this, $method->getName() );
 
@@ -45,6 +56,11 @@ class KB_At {
 		}
 	}
 
+	/**
+	 * Utility function to extract all @ values in a doc block.
+	 *
+	 * @return [String]String Array `@xyz abc` is returned as the value `abc` at key `xyz`.
+	 */
 	private function docBlockExtractor( $docBlock ) {
 			$matches = Array();
 			$docs = Array();
