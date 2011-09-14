@@ -97,9 +97,9 @@
 	 * this function only initializes required scripts and styles on the appropriate
 	 * plugin pages.
 	 */
-	public function __construct( $args ) {
+	public function __construct() {
 		/** Add the admin menu page */
-		if( isset( $args['menu-title.php'] ) )
+		if( isset( $this->menu_title ) )
 			add_action( ( is_network_admin() )? 'network_admin_menu' : 'admin_menu', Array( $this, 'add_to_menu' ), 10 );
 		else 
 			add_action( ( is_network_admin() )? 'network_admin_menu' : 'admin_menu', Array( $this, 'hook_page' ), 9 );
@@ -110,7 +110,7 @@
 
 	/** Add menus and determine the hook. */
 	public function add_to_menu() {
-		if( $this->args['parent'] == 'admin.php' )
+		if( $this->parent == 'admin.php' )
 			$this->hook = add_menu_page( 
 				$this->page_title, 
 				$this->menu_title, 
