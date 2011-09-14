@@ -9,30 +9,65 @@
  */
 
 /**
- * Automates adding functions to actions/filters.
+ * Syntactic sugar for adding functions to actions/filters.
  *
- * Usage in any child class:
- * A method of the form 
- *     `at_<hook name>__[<priority>_][<args>_]<method name>`
- * will be attached to the corresponding <hook name>.
+ * In any class extending KB_At, adding phpdoc variables:
+ *   - @hook <hook name>
+ *   - [@priority <priority>]
+ * will add that particular function to the specified hook.
  *
- * Terms in [] are optional.
+ * The number of arguments to be passed will be picked up
+ * automatically by reflection based on the arguments added
+ * in the function.
  */
 class KB_At {
-	public function __construct() {
-		kb_debug( "Called" );
-		$methods = get_class_methods( $this );
-		foreach( $methods as $method ) {
-			if( preg_match( '/at_(.+?)__(?:([0-9]*)_)?(?:([0-9]*)_)?*./', $method, $matches ) > 0 ) {
-				kb_debug( $matches );
+	/**
+	 * Reflection of this class.
+	 * @var ReflectionClass
+	 */
+	private $reflect;
 
-				if( !isset( $matches[2] ) && !isset( $matches[3] ) )
-					add_filter( $matches[1], Array( $this, $method ) );
-				else if( !isset( $matches[3] ) )
-					add_filter( $matches[1], Array( $this, $method ), $matches[2] );
+	/**
+	 * Hooks based on docs
+	 *
+	 * Obtains the docblocks for each method of the class,
+	 * and checks both for the existence of at @hook and
+	 * that the function is publically accessible.
+	 */
+	public function __construct() {
+		$this->reflect = new ReflectionClass( $this );
+		$methods = $this->reflect->getMethods();
+		
+		foreach( $methods as $method ) {
+			$docBlock = $method->getDocComment(); 
+			$docs = $this->docBlockExtractor( $docBlock );
+
+			if( array_key_exists( 'hook', $docs ) && $method->isPublic() ) {
+				$params = $method->getNumberOfParameters();
+				$func = Array( $this, $method->getName() );
+
+				if( did_action( $docs[ 'hook' ] ) && $params == 0 )
+					call_user_func( $func );
 				else 
-					add_filter( $matches[1], Array( $this, $method ), $matches[2], $matches[3] );
+					add_filter( $docs[ 'hook' ], $func, 
+						    array_key_exists( 'priority', $docs ) ? $docs['priority'] : 10,
+						    $params );
 			}
 		}
+	}
+
+	/**
+	 * Utility function to extract all @ values in a doc block.
+	 *
+	 * @return [String]String Array `@xyz abc` is returned as the value `abc` at key `xyz`.
+	 */
+	private function docBlockExtractor( $docBlock ) {
+			$matches = Array();
+			$docs = Array();
+
+			if( preg_match_all( '/@(.+?)\s+(.+?)\s*\n/', $docBlock, $matches ) )
+				foreach( $matches[0] as $key => $match )
+					$docs[ $matches[1][$key] ] = $matches[2][$key];
+			return $docs;	
 	}
 }
