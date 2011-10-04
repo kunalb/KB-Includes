@@ -31,7 +31,7 @@ class KB_At {
 	 * Hooks based on docs
 	 *
 	 * Obtains the docblocks for each method of the class,
-	 * and checks both for the existence of at @hook and
+	 * and checks both for the existence of at '@hook' and
 	 * that the function is publically accessible.
 	 */
 	public function __construct() {
