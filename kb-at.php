@@ -8,6 +8,8 @@
  * @package KB_Includes
  */
 
+if( !class_exists( 'KB_At' ) ) {
+
 /**
  * Syntactic sugar for adding functions to actions/filters.
  *
@@ -70,4 +72,6 @@ class KB_At {
 					$docs[ $matches[1][$key] ] = $matches[2][$key];
 			return $docs;	
 	}
+}
+
 }
