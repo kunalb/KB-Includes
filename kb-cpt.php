@@ -71,4 +71,17 @@ CSS;
 		$screen = get_current_screen();
 		return ( $this->id == $screen->post_type && ( $screen->base == 'post' || $screen->base == 'edit' )  );
 	}
+
+	/**
+	 * @hook contextual_help_list
+	 */
+	public function help_wrapper( $help, $screen ) {
+		if( $screen->post_type == $this->id )
+			$help[ $screen->id ] = $this->help( $screen );
+		
+		return $help;	
+	}
+
+	public function help( $screen ) {
+	}
 }
