@@ -137,7 +137,7 @@
 	 * Wrapper for conditionally loading resources 
 	 * @param string hook The current hook suffix for checking before loading.
 	 */
-	public function init( $hook ) {
+	public function init() {
 		if( $this->current_page() ) {
 			$this->load_resources();
 

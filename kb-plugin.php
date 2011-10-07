@@ -10,6 +10,8 @@
 
 /**
  * Base class for plugins.
+ *
+ * To do: extend into an KB-Includes dependency generator.
  */
 class KB_Plugin extends KB_At {
 }
