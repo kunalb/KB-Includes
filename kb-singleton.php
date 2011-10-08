@@ -3,6 +3,8 @@
 /**
  * A generic singleton class. 
  * @package KB_Includes
+ * @copyright Copyright (c) 2011, Kunal Bhalla
+ * @license http://www.gnu.org/licenses/gpl-2.0.html
  */	
 
 /**
