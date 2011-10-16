@@ -192,7 +192,6 @@
 
 		$this->is = true;
 	}
-	 
 
 	/**
 	 * Returns true if the current page is the one added by this class.
@@ -231,6 +230,12 @@ ADMIN_PAGE;
 	 * echo the data to be displayed. 
 	 */
 	public function body() {
+	}
+
+	/**
+	 * Override to save metabox data.
+	 */
+	public function save() {
 	}
 
  }

@@ -17,11 +17,26 @@
  */
 class KB_Cpt extends KB_At {
 
+	/**@#+ Basic -- registering the post type */
+	
+	/** The post type identifier */
+	protected $id;
+
 	/** Arguments passed on for registering the post type. */
 	protected $args;
 
-	/** The post type identifier */
-	protected $id;
+	/**
+	 * Registers the current post type at the init hook.
+	 * @hook init
+	 */
+	public function register() {
+		register_post_type( $this->id, $this->args );
+	}
+
+	/**@#-*/
+
+	
+	/**@#+ Modifying the icons in the menu */
 
 	/** Icon for edit page */
 	protected $icon32;
@@ -36,41 +51,9 @@ class KB_Cpt extends KB_At {
 	protected $icon16x;
 
 	/**
-	 * Registers the current post type at the init hook.
-	 * @hook init
-	 */
-	public function register() {
-		register_post_type( $this->id, $this->args );
-	}
-
-	/**
-	 * Over-ride to register taxonomies.
-	 * @hook init
-	 */
-	public function taxonomies() {
-	}
-
-	/**
-	 * Enqueues resources on the right page.
-	 * @hook admin_enqueue_scripts
-	 */
-	public function edit_resources_wrapper() {
-		$screen = get_current_screen();
-		if( $this->id == $screen->post_type ) 
-			$this->edit_resources( $screen );
-	}
-
-	/**
-	 * Override to add custom files to be added at the edit screens.
-	 * @param $screen The current screen value
-	 */
-	public function edit_resources( $screen ) {
-	}
-
-	/**
 	 * Swaps the icons by over-riding the CSS. 
 	 *
-	 * Done this way to work around the defaurt icon over-ride method by WordPress.
+	 * Done this way to work around the default icon over-ride method by WordPress.
 	 * -- That method doesn't allow adding icons for hover, highlighted, etc.
 	 *
 	 * @hook admin_print_styles
@@ -103,6 +86,33 @@ class KB_Cpt extends KB_At {
 		$screen = get_current_screen();
 		return ( $this->id == $screen->post_type && ( $screen->base == 'post' || $screen->base == 'edit' )  );
 	}
+
+	/**@#-*/
+
+	/**
+	 * Over-ride to register taxonomies.
+	 * @hook init
+	 */
+	public function taxonomies() {
+	}
+
+	/**
+	 * Enqueues resources on the right page.
+	 * @hook admin_enqueue_scripts
+	 */
+	public function edit_resources_wrapper() {
+		$screen = get_current_screen();
+		if( $this->id == $screen->post_type ) 
+			$this->edit_resources( $screen );
+	}
+
+	/**
+	 * Override to add custom files to be added at the edit screens.
+	 * @param $screen The current screen value
+	 */
+	public function edit_resources( $screen ) {
+	}
+
 
 	/**
 	 * Calls the helper function on the appropriate screens. 

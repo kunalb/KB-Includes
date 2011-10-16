@@ -37,25 +37,48 @@ class KB_At {
 	 * Obtains the docblocks for each method of the class,
 	 * and checks both for the existence of at '@hook' and
 	 * that the function is publically accessible.
+	 *
+	 * For classes over-riding inherited functions, this backtracs
+	 * till it reaches KB_At or till it finds an '@hook' docbloc for 
+	 * the current class.
 	 */
 	public function __construct() {
 		$this->reflect = new ReflectionClass( $this );
 		$methods = $this->reflect->getMethods();
 		
 		foreach( $methods as $method ) {
-			$docBlock = $method->getDocComment(); 
-			$docs = $this->docBlockExtractor( $docBlock );
+			if( $method->isPublic() ) {
+				$func = ''; $priority = 10; $params = 0; $hook = '';
+				$currentMethod = $method; $currentClass = $this->reflect;
 
-			if( array_key_exists( 'hook', $docs ) && $method->isPublic() ) {
-				$params = $method->getNumberOfParameters();
-				$func = Array( $this, $method->getName() );
+				while( !empty( $currentMethod ) && empty( $hook ) ) {
+					$docBlock = $currentMethod->getDocComment(); 
+					$docs = $this->docBlockExtractor( $docBlock );
 
-				if( did_action( $docs[ 'hook' ] ) && $params == 0 )
-					call_user_func( $func );
-				else 
-					add_filter( $docs[ 'hook' ], $func, 
-						    array_key_exists( 'priority', $docs ) ? $docs['priority'] : 10,
-						    $params );
+					if( array_key_exists( 'hook', $docs ) ) {
+						$hook = $docs[ 'hook' ];
+						$params = $method->getNumberOfParameters();
+						$func = Array( $this, $method->getName() );
+						if( array_key_exists( 'priority', $docs ) )
+							$priority = $docs[ 'priority' ];
+					}
+
+					if( $currentClass->getParentClass() !=  false ) {
+						$parentClass = $currentClass->getParentClass();
+						if( $parentClass->hasMethod( $currentMethod->getName() ) ) {
+							$currentMethod = $parentClass->getMethod( $currentMethod->getName() );
+							$currentClass = $parentClass;
+						} else
+							$currentMethod = "";	
+					} else $currentMethod = "";	
+				}
+
+				if( !empty( $func ) ) {
+					if( did_action( $hook ) && $params == 0 )
+						call_user_func( $func );
+					else 
+						add_filter( $hook, $func, $priority, $params );
+				}
 			}
 		}
 	}
@@ -77,3 +100,14 @@ class KB_At {
 }
 
 }
+
+/**
+ * Changelog
+ * =========
+ *
+ * - 0.2
+ *   - Catch hooks of the parent class
+ *
+ * - 0.1
+ *   - Initial Version
+ */
