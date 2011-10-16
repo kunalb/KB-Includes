@@ -25,12 +25,27 @@ class KB_Cpt extends KB_At {
 	/** Arguments passed on for registering the post type. */
 	protected $args;
 
+
 	/**
 	 * Registers the current post type at the init hook.
 	 * @hook init
 	 */
 	public function register() {
-		register_post_type( $this->id, $this->args );
+		register_post_type( $this->id, $this->parse_args($this->args) );
+	}
+
+	/**
+	 * Performs clean up and other behind the scenes work.
+	 * @param Array Arguments provided by user
+	 */
+	private function parse_args( $args ) {
+		/* Disable the default icon -- will override the hover animation. */
+		if( isset( $this->icon16 ) )  $args['menu_icon'] = '';
+
+		/* Set the callback for metaboxes if not over-ridden */
+		if( !array_key_exists( 'register_meta_box_cb', $args ) ) $args[] = Array( $this, 'metaboxes' );
+
+		return $args;
 	}
 
 	/**@#-*/
@@ -84,35 +99,13 @@ class KB_Cpt extends KB_At {
 	 */
 	private function is_edit() {
 		$screen = get_current_screen();
-		return ( $this->id == $screen->post_type && ( $screen->base == 'post' || $screen->base == 'edit' )  );
+		return ( isset( $screen->post_type ) && $this->id == $screen->post_type && ( $screen->base == 'post' || $screen->base == 'edit' )  );
 	}
 
 	/**@#-*/
 
-	/**
-	 * Over-ride to register taxonomies.
-	 * @hook init
-	 */
-	public function taxonomies() {
-	}
 
-	/**
-	 * Enqueues resources on the right page.
-	 * @hook admin_enqueue_scripts
-	 */
-	public function edit_resources_wrapper() {
-		$screen = get_current_screen();
-		if( $this->id == $screen->post_type ) 
-			$this->edit_resources( $screen );
-	}
-
-	/**
-	 * Override to add custom files to be added at the edit screens.
-	 * @param $screen The current screen value
-	 */
-	public function edit_resources( $screen ) {
-	}
-
+	/**@#+ Setting up the help screen */
 
 	/**
 	 * Calls the helper function on the appropriate screens. 
@@ -144,5 +137,44 @@ class KB_Cpt extends KB_At {
 	 */	
 	public function help( $screen ) {
 		return "This project can be found on <a href = 'https://github.com/kunalb/KB-Includes'>Github</a>.";
+	}
+
+	/**@#-*/
+
+
+	/**@#+ Handle custom resources */
+
+	/**
+	 * Enqueues resources on the right page.
+	 * @hook admin_enqueue_scripts
+	 */
+	public function edit_resources_wrapper() {
+		$screen = get_current_screen();
+		if( isset( $screen->post_type ) && $this->id == $screen->post_type ) 
+			$this->edit_resources( $screen );
+	}
+
+	/**
+	 * Override to add custom files to be added at the edit screens.
+	 * @param $screen The current screen value
+	 */
+	public function edit_resources( $screen ) {
+	}
+	
+	/*@#-*/
+
+	/**
+	 * Over-ride to register taxonomies or use hook.
+	 * @hook init
+	 */
+	public function taxonomies() {
+		do_action( 'KB_Cpt' . $this->id . '_taxonomies' );
+	}
+
+	/**
+	 * Override to register metaboxes -- or use hook.
+	 */
+	public function metaboxes() {
+		do_action( 'KB_Cpt_' . $this->id . '_metaboxes' );
 	}
 }
