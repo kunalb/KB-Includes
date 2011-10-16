@@ -4,7 +4,7 @@
  * Eases adding hooks and actions.
  *
  * @author Kunal Bhalla
- * @version 0.1
+ * @version 0.2
  * @package KB_Includes
  * @copyright Copyright (c) 2011, Kunal Bhalla
  * @license http://www.gnu.org/licenses/gpl-2.0.html
