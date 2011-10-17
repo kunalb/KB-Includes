@@ -15,19 +15,19 @@
  *
  * Extend and initiate this class for every admin page created.
  */
- class KB_Admin {
+ class KB_Admin extends KB_At {
 
 	/**
 	 * The suffix generated for this plugin.
 	 * @var string
 	 */
-	private $hook;
+	protected $hook;
 
 	/**
 	 * Is this page the current page?
 	 * @var Bool
 	 */
-	private $is;
+	protected $is;
 
 	/**#@+
 	 * Over-ride these variables to create a new page class.
@@ -169,7 +169,7 @@
 		add_action( $this->hook, Array( $this, 'body_wrapper' ) );
 		add_action( 'load-' . $this->hook, Array( $this, 'set_current_page' ) );
 
-		add_filter( 'admin_title', Array( $this, hook_page_title ) , 10, 2 );
+		add_filter( 'admin_title', Array( $this, 'hook_page_title' ) , 10, 2 );
 	}
 
 	/**
@@ -231,11 +231,4 @@ ADMIN_PAGE;
 	 */
 	public function body() {
 	}
-
-	/**
-	 * Override to save metabox data.
-	 */
-	public function save() {
-	}
-
  }

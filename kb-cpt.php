@@ -121,7 +121,7 @@ class KB_Cpt extends KB_At {
 	 * @return Array The modified help details array.
 	 */
 	public function help_wrapper( $help, $screen ) {
-		if( $screen->post_type == $this->id )
+		if( isset( $screen->post_type ) && $screen->post_type == $this->id )
 			$help[ $screen->id ] = $this->help( $screen );
 		
 		return $help;	
@@ -177,4 +177,7 @@ class KB_Cpt extends KB_At {
 	public function metaboxes() {
 		do_action( 'KB_Cpt_' . $this->id . '_metaboxes' );
 	}
+
+	/*@#+ Set up the edit screen */
+	/*@#-*/
 }
