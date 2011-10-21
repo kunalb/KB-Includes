@@ -33,6 +33,11 @@ class KB_Setting extends KB_At {
 	protected $plugin;
 
 	/**
+	 * The id this seting was constructed for.
+	 */
+	protected $id; 
+
+	/**
 	 * Constructor -- initializes saved data if required.
 	 *
 	 * Default values are passed to this constructor -- which will be saved in case 
@@ -55,12 +60,14 @@ class KB_Setting extends KB_At {
 			self::$container[ $this->plugin ] = ( get_option( $this->option(), Array() ) );
 		}
 
-		if( is_array( self::$container[ $this->plugin ] ) && array_key_exists( $id, self::$container[ $this->plugin ] ) )
-			return self::$container[ $this->plugin ][ $id ];
-		else
+		if( !( is_array( self::$container[ $this->plugin ] ) && array_key_exists( $id, self::$container[ $this->plugin ] ) ) )
 			self::$container[ $this->plugin ][ $id ] = $defaults;
-		 
-		return $defaults; 	 
+		
+		$this->id = $id;	
+	}
+
+	public function get() {
+		return self::$container[ $this->plugin ][ $this->id ];
 	}
 
 	/**

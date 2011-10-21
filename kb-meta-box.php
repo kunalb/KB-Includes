@@ -68,7 +68,7 @@ class KB_Meta_Box extends KB_At {
 	 * Handles metabox cruft: nonce generation et al.
 	 */
 	public function body_wrapper( $post ) {
-		wp_nonce_field( $this->nonce, 'kb-metabox-nonce-' . $this->id );
+		wp_nonce_field( $this->nonce(), 'kb-metabox-nonce-' . $this->id );
 		$this->body( $post );
 	}
 
