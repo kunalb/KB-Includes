@@ -45,7 +45,7 @@ class KB_At {
 	public function __construct() {
 		$this->reflect = new ReflectionClass( $this );
 		$methods = $this->reflect->getMethods();
-
+		
 		foreach( $methods as $method ) {
 			if( $method->isPublic() ) {
 				$func = ''; $priority = 10; $params = 0; $hook = '';

@@ -66,7 +66,9 @@ class KB_Setting extends KB_At {
 	 * @return String json
 	 */
 	public static function getData($plugin) {
-		return "\"{$plugin}\":". json_encode( self::$container[ $plugin ] );
+		if( isset( self::$container[ $plugin ] ) )
+			return "{\"{$plugin}\":". json_encode( self::$container[ $plugin ] ) . "}";
+		else return "{\"{$plugin}\": {}}";
 	}
 
 	/**

@@ -53,21 +53,20 @@ class KB_Config extends KB_Admin {
 		$this->resources = plugins_url( $this->plugin ) . '/includes/resources' ;
 	}
 
-	/**
-	 * Processing the Plugin's content to make a full JSON document.
-	 * @var String $json 
-	 * @return String 
+	/** 
+	 * Returns the key value of the nonce to be used.
 	 */
-	protected function make_JSON( $json ){
-		return '{' . $json . '}';
+	protected function nonce() {
+		return 'kb-config-save-' . $this->plugin;
 	}
 
 	/**
 	 * Displays and initializes the editor, as well as the asscciated scripts and styles.
 	 */
 	public function body() {
-		$content = $this->make_JSON( KB_Setting::getData( $this->plugin ) );
+		$content = KB_Setting::getData( $this->plugin );
 		$posturl = get_admin_url() . 'admin-ajax.php';
+		$nonce   = wp_create_nonce( $this->nonce() );
 
 		echo "<div id='icon-options-general' class='icon32'><br></div>";
 		echo "<h2>" . $this->title . "</h2>";
@@ -106,7 +105,8 @@ class KB_Config extends KB_Admin {
 								$.post( "$posturl", {
 									"action": "kb_config_save",
 									"kb-plugin": "{$this->plugin}",
-									"kb-data"  : encodeURIComponent(content)
+									"kb-data"  : encodeURIComponent(content),
+									"kb-nonce" : "$nonce"
 								}, function(data){
 									var result = $.parseJSON(data);
 									if (result.success) {
@@ -159,7 +159,7 @@ SCRIPT;
 	 */
 	public function save_settings() {
 		$data = json_decode( urldecode( $_POST[ 'kb-data' ] ), true );
-		if( update_option( 'kb-config-' . $_POST[ 'kb-plugin' ], $data[ $_POST[ 'kb-plugin' ] ] ) )
+		if( wp_verify_nonce( $_POST[ 'kb-nonce' ], $this->nonce() ) && update_option( 'kb-config-' . $_POST[ 'kb-plugin' ], $data[ $_POST[ 'kb-plugin' ] ] ) )
 			die( '{"success": true}');
 		else
 			die( '{"success": false}');
