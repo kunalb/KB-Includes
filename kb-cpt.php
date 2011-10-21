@@ -12,6 +12,8 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html
  */
 
+if( !class_exists( 'KB_Cpt' ) ) {
+
 /** 
  * Generic class to handle common CPT functionality.
  */
@@ -180,4 +182,6 @@ class KB_Cpt extends KB_At {
 
 	/*@#+ Set up the edit screen */
 	/*@#-*/
+}
+
 }
