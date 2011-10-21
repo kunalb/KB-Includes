@@ -44,6 +44,8 @@ class KB_Setting extends KB_At {
 	 * @return mixed The corresponding options for this run
 	 */
 	public function __construct( $id, $defaults ) {
+		parent::__construct();
+
 		if( empty( $this->plugin ) )
 			die( "Plugin must be specified in KB_Setting." );
 
