@@ -61,7 +61,6 @@ class KB_Meta_Box extends KB_At {
 	 * Registers the metabox for display.
 	 */
 	public function register() {
-		KB_Debug( "Called" );
 		add_meta_box( $this->id, $this->title, Array( $this, 'body_wrapper' ), $this->post_type, $this->context, $this->priority );
 	}
 
