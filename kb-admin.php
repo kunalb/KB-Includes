@@ -100,6 +100,8 @@
 	 * plugin pages.
 	 */
 	public function __construct() {
+		parent::__construct();
+
 		/** Add the admin menu page */
 		if( isset( $this->menu_title ) )
 			add_action( ( is_network_admin() )? 'network_admin_menu' : 'admin_menu', Array( $this, 'add_to_menu' ), 10 );
