@@ -33,9 +33,10 @@ class KB_Setting extends KB_At {
 	protected $plugin;
 
 	/**
-	 * The id this seting was constructed for.
+	 * The value this seting was constructed for.
+	 * @var mixed
 	 */
-	protected $id; 
+	protected $value; 
 
 	/**
 	 * Constructor -- initializes saved data if required.
@@ -43,6 +44,9 @@ class KB_Setting extends KB_At {
 	 * Default values are passed to this constructor -- which will be saved in case 
 	 * there is no custom configuration saved yet; returns the actual value to be 
 	 * used based on saved settings.
+	 *
+	 * The id's are namespaced similar to PHP syntax "a\b\c" and so on: passing the id
+	 * a\b\c will set [plugin][a][b][c] = option.
 	 *
 	 * @param string $id Identifier for this setting.
 	 * @param mixed $defaults The default value for this string
@@ -60,14 +64,26 @@ class KB_Setting extends KB_At {
 			self::$container[ $this->plugin ] = ( get_option( $this->option(), Array() ) );
 		}
 
-		if( !( is_array( self::$container[ $this->plugin ] ) && array_key_exists( $id, self::$container[ $this->plugin ] ) ) )
-			self::$container[ $this->plugin ][ $id ] = $defaults;
-		
-		$this->id = $id;	
-	}
+		$idArray = explode( "\\", $id ); $intermediate = &self::$container[ $this->plugin ];
+		foreach( $idArray as $idA ) {
+			if( !array_key_exists( $idA, $intermediate ) )
+				$intermediate[ $idA ] = Array();	
 
+			$intermediate = &$intermediate[ $idA ];
+		}
+		
+		if( empty( $intermediate ) )
+			$intermediate = $defaults;
+		
+		$this->value = $intermediate;
+	}
+	
+	/** 
+	 * Return the value corresponding to the current setting.
+	 * @return Mixed value
+	 */
 	public function get() {
-		return self::$container[ $this->plugin ][ $this->id ];
+		return $this->value;
 	}
 
 	/**
