@@ -66,7 +66,7 @@ class KB_Setting extends KB_At {
 
 		$idArray = explode( "\\", $id ); $intermediate = &self::$container[ $this->plugin ];
 		foreach( $idArray as $idA ) {
-			if( !array_key_exists( $idA, $intermediate ) )
+			if( !is_array( $intermediate ) || !array_key_exists( $idA, $intermediate ) )
 				$intermediate[ $idA ] = Array();	
 
 			$intermediate = &$intermediate[ $idA ];

@@ -102,6 +102,23 @@ class KB_Meta_Box extends KB_At {
 	protected function nonce() {
 		return 'kb-meta-box-' . $this->post_type . '-' . $this->id;
 	}
+
+	/**
+	 * Checks for the correct screen and asks to enqueue resources as required.
+	 * @hook admin_enqueue_scripts 
+	 */
+	public function resources_wrapper() {
+		global $current_screen;
+		if( $current_screen->post_type == $this->post_type && 
+		    $current_screen->base == 'post' )
+			$this->resources();
+	}
+
+	/**
+	 * Override to enqueue metabox specific scripts and resources.
+	 */
+	protected function resources() {
+	}
 }
 
 }
